@@ -29,6 +29,11 @@ handle_command:
     call streq
     jc do_halt
 
+    mov si, cmd_shutdown
+    mov di, buffer
+    call streq
+    jc do_shutdown
+
     mov si, cmd_layout
     mov di, buffer
     call streq
@@ -85,6 +90,39 @@ do_info:
 do_halt:
     mov si, msg_halt
     call print
+    cli
+    hlt
+    jmp $
+
+do_shutdown:
+    mov si, msg_shutdown
+    call print
+    ; APM shutdown (works in VirtualBox)
+    mov ax, 0x5300
+    xor bx, bx
+    int 0x15
+    jc .halt
+    mov ax, 0x5301
+    xor bx, bx
+    int 0x15
+    jc .halt
+    mov ax, 0x530E
+    xor bx, bx
+    mov cx, 0x0102
+    int 0x15
+    mov ax, 0x5308
+    mov bx, 1
+    mov cx, 1
+    int 0x15
+    mov ax, 0x530F
+    mov bx, 1
+    mov cx, 1
+    int 0x15
+    mov ax, 0x5307
+    mov bx, 1
+    mov cx, 3
+    int 0x15
+.halt:
     cli
     hlt
     jmp $

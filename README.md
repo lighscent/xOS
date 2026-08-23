@@ -11,6 +11,7 @@ simple 16-bit os with asm
 - `layout` - shows current layout, `layout azerty` or `layout qwerty` to switch
 - `reboot` - reboots
 - `halt` - halts the cpu
+- `shutdown` - powers off
 
 ## todo
 

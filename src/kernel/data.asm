@@ -19,6 +19,7 @@ cmd_clear:  db "clear",0
 cmd_reboot: db "reboot",0
 cmd_info:   db "info",0
 cmd_halt:   db "halt",0
+cmd_shutdown: db "shutdown",0
 cmd_layout: db "layout",0
 prefix_layout: db "layout",0
 prefix_echo:db "echo",0
@@ -32,7 +33,8 @@ help_text:  db "Commands:",13,10
             db "  echo <text> - print text",13,10
             db "  layout [azerty|qwerty] - show/set layout",13,10
             db "  reboot - reboot machine",13,10
-            db "  halt   - halt CPU",13,10,13,10,0
+            db "  halt   - halt CPU",13,10
+            db "  shutdown - power off",13,10,13,10,0
 
 info_text:  db "xOS info:",13,10
             db "  Architecture: x86 16-bit real mode",13,10
@@ -44,6 +46,7 @@ info_text:  db "xOS info:",13,10
 msg_unknown:db "Unknown command. Type 'help'.",13,10,0
 msg_reboot: db "Rebooting...",13,10,0
 msg_halt:   db "System halted.",13,10,0
+msg_shutdown: db "Shutting down...",13,10,0
 msg_azerty: db "Switched to AZERTY (a<->q, z<->w).",13,10,0
 msg_qwerty: db "Switched to QWERTY.",13,10,0
 msg_layout_azerty: db "Layout: AZERTY",13,10,0
