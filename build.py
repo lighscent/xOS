@@ -28,7 +28,11 @@ def find_nasm():
 def assemble(nasm, src, out):
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = [nasm, "-f", "bin", str(src), "-o", str(out)]
-    print(f"[+] {src.name} -> {out.name}")
+    # if src is under src/kernel, add include path so %include works
+    if "src" in src.parts and "kernel" in src.parts:
+        inc = str(ROOT / "src" / "kernel") + os.sep
+        cmd = [nasm, "-f", "bin", "-I", inc, str(src), "-o", str(out)]
+    print(f"[+] {src} -> {out.name}")
     subprocess.run(cmd, check=True)
 
 def make_img(boot_bin, kernel_bin, out_img):
@@ -139,8 +143,11 @@ def main():
         sys.exit(1)
     print(f"[+] using nasm: {nasm}")
     BUILD.mkdir(exist_ok=True)
-    boot_src = ROOT / "boot.asm"
-    kern_src = ROOT / "kernel.asm"
+    # new organized layout
+    boot_src_new = ROOT / "src" / "boot" / "boot.asm"
+    kern_src_new = ROOT / "src" / "kernel" / "main.asm"
+    boot_src = boot_src_new if boot_src_new.exists() else ROOT / "boot.asm"
+    kern_src = kern_src_new if kern_src_new.exists() else ROOT / "kernel.asm"
     boot_bin = BUILD / "boot.bin"
     kern_bin = BUILD / "kernel.bin"
     img = BUILD / "os.img"
@@ -154,8 +161,18 @@ def main():
         kern_bin = None
 
     make_img(boot_bin, kern_bin, img)
+    # also keep xos.img / xos.iso in sync (canonical name for xOS)
+    try:
+        import shutil
+        shutil.copy(img, BUILD / "xos.img")
+        print(f"[+] copied to xos.img")
+    except Exception as e:
+        print(f"[!] copy to xos.img failed: {e} (VM running / file locked? poweroff first)")
     try:
         make_iso(boot_bin, iso)
+        import shutil
+        shutil.copy(iso, BUILD / "xos.iso")
+        print(f"[+] copied to xos.iso")
     except Exception as e:
         print(f"[!] iso failed: {e}")
 

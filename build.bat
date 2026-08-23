@@ -6,10 +6,20 @@ echo Using NASM: %NASM%
 
 if not exist build mkdir build
 
-echo Assembling boot.asm...
-"%NASM%" -f bin boot.asm -o build\boot.bin || exit /b 1
-echo Assembling kernel.asm...
-"%NASM%" -f bin kernel.asm -o build\kernel.bin || exit /b 1
+if exist src\boot\boot.asm (
+  echo Assembling src\boot\boot.asm...
+  "%NASM%" -f bin src\boot\boot.asm -o build\boot.bin || exit /b 1
+) else (
+  echo Assembling boot.asm...
+  "%NASM%" -f bin boot.asm -o build\boot.bin || exit /b 1
+)
+if exist src\kernel\main.asm (
+  echo Assembling src\kernel\main.asm...
+  "%NASM%" -I src\kernel\ -f bin src\kernel\main.asm -o build\kernel.bin || exit /b 1
+) else (
+  echo Assembling kernel.asm...
+  "%NASM%" -f bin kernel.asm -o build\kernel.bin || exit /b 1
+)
 
 echo Building os.img (1.44MB floppy)...
 copy /b build\boot.bin+build\kernel.bin build\os.tmp >nul
