@@ -19,6 +19,7 @@ start:
     call print
 
 main_loop:
+    call usb_poll_throttled
     mov si, prompt
     call print
     call read_line
@@ -30,6 +31,7 @@ main_loop:
 %include "string.asm"
 %include "shell.asm"
 %include "config.asm"
+%include "usb.asm"
 %include "data.asm"
 
 times 8192-($-$$) db 0

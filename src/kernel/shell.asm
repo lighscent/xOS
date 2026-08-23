@@ -71,8 +71,104 @@ do_reboot:
     jmp 0xFFFF:0x0000
 
 do_info:
-    mov si, info_text
+    mov si, info_header
     call print
+    mov si, msg_arch
+    call print
+    mov si, msg_kernel
+    call print
+    mov si, msg_boot
+    call print
+    mov al, [boot_drive]
+    call print_hex_byte
+    cmp byte [boot_drive], 0x80
+    jae .is_hdd
+    mov si, msg_boot_floppy
+    call print
+    jmp .after_boot
+.is_hdd:
+    mov si, msg_boot_hdd
+    call print
+.after_boot:
+    call print_nl
+    mov si, msg_mem_conv
+    call print
+    xor ax, ax
+    int 0x12
+    jc .mem_conv_err
+    call print_dec
+    mov si, msg_kb
+    call print
+    jmp .mem_ext
+.mem_conv_err:
+    mov si, msg_na
+    call print
+.mem_ext:
+    call print_nl
+    mov si, msg_mem_ext
+    call print
+    mov ah, 0x88
+    int 0x15
+    jc .mem_ext_err
+    test ax, ax
+    jz .mem_ext_err
+    call print_dec
+    mov si, msg_kb
+    call print
+    jmp .after_mem
+.mem_ext_err:
+    mov si, msg_na
+    call print
+.after_mem:
+    call print_nl
+    mov si, msg_disk
+    call print
+    mov ah, 0x08
+    mov dl, [boot_drive]
+    xor di, di
+    mov es, di
+    int 0x13
+    jc .disk_err
+    ; CH low cyl, CL high cyl bits + sectors, DH max head
+    mov al, dh
+    inc ax
+    push ax          ; heads
+    mov al, cl
+    and al, 0x3F
+    push ax          ; spt
+    mov al, ch
+    mov ah, cl
+    shr ah, 6
+    ; ah now high 2 bits, al low 8
+    ; combine: cylinders = (ah<<8|al)+1? Actually cyl = (ah<<8 | al) ??? No, ah is high 2 bits, need ((ah<<8) | al) ??? But ah is 0-3, so shift 8? Actually cylinder 10 bits: bits 0-7 = CH, bits 8-9 = CL[7:6]
+    ; So cyl = CH | ((CL & 0xC0)<<2)
+    mov bl, ch
+    mov bh, cl
+    shr bh, 6
+    mov al, bl
+    mov ah, bh
+    ; now AX = cylinder value (0-based) but need +1? Actually max cylinder = value, count = value+1
+    inc ax
+    push ax          ; cylinders
+    mov si, msg_disk_chs
+    call print
+    pop ax
+    call print_dec
+    mov si, msg_disk_h
+    call print
+    pop ax
+    call print_dec
+    mov si, msg_disk_s
+    call print
+    pop ax
+    call print_dec
+    ; also total sectors if we have? we can compute total = C*H*S but 16-bit may overflow; skip for large
+    jmp .after_disk
+.disk_err:
+    mov si, msg_disk_err2
+    call print
+.after_disk:
+    call print_nl
     cmp byte [layout], 0
     je .qwerty
     mov si, msg_layout_azerty
@@ -89,8 +185,10 @@ do_halt:
     mov si, msg_halt
     call print
 .halt_loop:
+    call usb_poll_throttled
     sti
     hlt
+    call usb_poll_throttled
     mov ah, 0x01
     int 0x16
     jz .halt_loop
@@ -131,8 +229,10 @@ do_shutdown:
     mov cx, 3
     int 0x15
 .halt:
+    call usb_poll_throttled
     sti
     hlt
+    call usb_poll_throttled
     mov ah, 0x01
     int 0x16
     jz .halt

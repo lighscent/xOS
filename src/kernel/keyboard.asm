@@ -69,6 +69,10 @@ read_line:
     xor di, di
     mov cx, 0
 .loop:
+    call usb_poll_throttled
+    mov ah, 0x01
+    int 0x16
+    jz .loop
     mov ah, 0x00
     int 0x16
     call translate_key
