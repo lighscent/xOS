@@ -24,7 +24,7 @@ fn trim_after(buf: &[u8], n: usize) -> &[u8] {
 }
 
 fn do_help() {
-    vga::print("Commands:\n  help   - show this help\n  clear  - clear screen\n  info   - system info\n  echo <text> - print text\n  layout [azerty|qwerty] - show/set layout\n  reboot - reboot machine\n  halt   - halt CPU\n  shutdown - power off\n\n");
+    vga::print("Commands:\n  help   - show this help\n  clear  - clear screen\n  info   - system info\n  echo <text> - print text\n  layout [azerty|qwerty] - show/set layout\n  kbddebug - toggle scancode debug [XX S]\n  reboot - reboot machine\n  halt   - halt CPU\n  shutdown - power off\n\n");
 }
 fn do_clear() { vga::clear_screen(); }
 fn do_reboot() {
@@ -78,6 +78,7 @@ fn do_shutdown() {
 
 pub fn handle_command(buf: &[u8], boot_drive: u8) {
     if cstr_len(buf) == 0 { return; }
+    if streq(buf, b"kbddebug") { keyboard::toggle_kbd_debug(); vga::print("kbddebug toggled\n"); return; }
     if streq(buf, b"help") { do_help(); return; }
     if streq(buf, b"clear") { do_clear(); return; }
     if streq(buf, b"reboot") { do_reboot(); return; }

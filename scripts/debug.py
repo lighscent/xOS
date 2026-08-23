@@ -65,15 +65,15 @@ def vbox_debug(vm="xOS", mode="vm", headless=False, serial_log=None):
         except KeyboardInterrupt:
             subprocess.run([vbox,"controlvm",vm,"poweroff"])
 
-def qemu_debug(gdb=False):
+def qemu_debug(gdb=False, kbd="fr"):
     qemu=shutil.which("qemu-system-i386") or shutil.which("qemu-system-x86_64") or shutil.which("qemu")
     if not qemu:
         print("[-] qemu not found (winget install QEMU.QEMU)"); return
     img=BUILD/"xos-floppy.img"
     if (BUILD/"xos-vm.img").exists(): img=BUILD/"xos-vm.img"
-    cmd=[qemu, "-drive", f"file={img},format=raw", "-m","64", "-boot","c", "-serial","stdio", "-display","gtk"]
+    cmd=[qemu, "-drive", f"file={img},format=raw", "-m","64", "-boot","c", "-serial","stdio", "-display","gtk", "-k", kbd]
     if gdb: cmd+=["-s","-S"]
-    print(f"[+] {' '.join(cmd)}")
+    print(f"[+] {' '.join(cmd)} (kbd={kbd}, switch with --kbd en-us/fr)")
     subprocess.run(cmd)
 
 if __name__=="__main__":
@@ -85,10 +85,15 @@ if __name__=="__main__":
     ap.add_argument("--gdb",action="store_true",help="qemu wait gdb :1234")
     ap.add_argument("--vm",default="xOS")
     ap.add_argument("--serial",default="build/serial.log")
+    ap.add_argument("--kbd",default="fr", choices=["fr","en-us","none"], help="qemu keyboard map (fr for AZERTY host, en-us for QWERTY host)")
     args=ap.parse_args()
     if not args.no_build:
         run_build()
     if args.qemu:
-        qemu_debug(args.gdb)
+        if args.kbd == "none":
+            # strip -k arg inside qemu_debug by call without
+            qemu_debug(args.gdb, kbd="en-us")
+        else:
+            qemu_debug(args.gdb, kbd=args.kbd)
     else:
         vbox_debug(args.vm, args.mode, args.headless, pathlib.Path(args.serial) if args.headless else None)
