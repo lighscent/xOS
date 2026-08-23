@@ -50,3 +50,4 @@ msg_qwerty: db "Switched to QWERTY.",13,10,0
 msg_layout_azerty: db "Layout: AZERTY",13,10,0
 msg_layout_qwerty: db "Layout: QWERTY",13,10,0
 msg_layout_usage: db "Usage: layout [azerty|qwerty]",13,10,0
+msg_ctrlc:      db "^C",13,10,0

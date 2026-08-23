@@ -73,6 +73,8 @@ read_line:
     int 0x16
     call translate_key
 
+    cmp al, 3
+    je .ctrlc
     cmp al, 13
     je .done
     cmp al, 8
@@ -111,4 +113,10 @@ read_line:
 .done:
     mov byte [buffer+di], 0
     call print_nl
+    ret
+
+.ctrlc:
+    mov byte [buffer], 0
+    mov si, msg_ctrlc
+    call print
     ret

@@ -20,6 +20,7 @@ simple 16-bit os with asm
 - [x] basic commands
 - [x] build floppy + iso
 - [x] azerty and qwerty layout
+- [x] added SIGINT
 - [ ] protected mode 32bit
 - [ ] fat12 filesystem
 - [ ] text editor

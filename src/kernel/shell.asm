@@ -88,9 +88,19 @@ do_info:
 do_halt:
     mov si, msg_halt
     call print
-    cli
+.halt_loop:
+    sti
     hlt
-    jmp $
+    mov ah, 0x01
+    int 0x16
+    jz .halt_loop
+    mov ah, 0x00
+    int 0x16
+    cmp al, 3
+    jne .halt_loop
+    mov si, msg_ctrlc
+    call print
+    ret
 
 do_shutdown:
     mov si, msg_shutdown
@@ -121,9 +131,18 @@ do_shutdown:
     mov cx, 3
     int 0x15
 .halt:
-    cli
+    sti
     hlt
-    jmp $
+    mov ah, 0x01
+    int 0x16
+    jz .halt
+    mov ah, 0x00
+    int 0x16
+    cmp al, 3
+    jne .halt
+    mov si, msg_ctrlc
+    call print
+    ret
 
 do_azerty:
     mov byte [layout], 1
