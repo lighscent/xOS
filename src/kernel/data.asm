@@ -10,7 +10,7 @@ prompt:     db "xos> ",0
 nl:         db 13,10,0
 
 buffer:     times 64 db 0
-layout:     db 0
+layout:     db 1   ; 0=qwerty, 1=azerty (default)
 boot_drive: db 0
 cfg_sector: times 512 db 0
 
