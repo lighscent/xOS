@@ -26,6 +26,19 @@ pub unsafe fn init(drive: u8) {
     }
     FAIL_CNT = 0;
 }
+pub fn boot_drive() -> u8 { unsafe { BOOT_DRIVE } }
+pub fn mode() -> u8 { unsafe { MODE } }
+pub fn mode_str() -> &'static str {
+    match mode() {
+        1 => "ATA PIO (SATA/VDI)",
+        2 => "BIOS int13",
+        3 => "none",
+        _ => "uninit",
+    }
+}
+pub fn is_present() -> bool { unsafe {
+    match MODE { 1 => ata_present(), 2 => crate::bios::drive_present(BOOT_DRIVE), _ => true }
+}}
 
 pub fn poll_throttled() {
     static mut TICKS: u32 = 0;

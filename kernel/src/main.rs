@@ -7,10 +7,13 @@ mod shell;
 mod config;
 mod bios;
 mod usb;
+mod cpu;
+mod mem;
+mod gpu;
 
 use core::panic::PanicInfo;
 
-static BANNER: &str = "\nxOS v0.2 Rust | PM32 VGA\nType 'help'\n\n";
+static BANNER: &str = "\nxOS by xl1te\nType 'help'\n\n";
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {

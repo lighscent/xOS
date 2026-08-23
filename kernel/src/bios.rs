@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-use core::arch::asm;
 
 pub unsafe fn init() {
     let gdt = 0x500 as *mut u64;

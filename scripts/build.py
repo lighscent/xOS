@@ -123,15 +123,19 @@ def build_kernel_rust(release=True):
         return None
     profile = "release" if release else "debug"
     artifact = None
+    # inject BUILD_DATE for info command
+    import datetime
+    env = os.environ.copy()
+    env["BUILD_DATE"] = datetime.date.today().isoformat()
     # 1) try nightly custom i686-unknown-none.json (bare-metal, correct 0x7E00)
     json_target = kdir / "i686-unknown-none.json"
     if json_target.exists():
         nightly = [CARGO, "+nightly", "build", "-Z", "build-std=core", "-Z", "json-target-spec", "--target", str(json_target)]
         if release: nightly.append("--release")
         nightly_str = " ".join(nightly)
-        print(f"[+] {nightly_str}")
+        print(f"[+] {nightly_str}  BUILD_DATE={env['BUILD_DATE']}")
         try:
-            subprocess.run(nightly, check=True, cwd=str(kdir))
+            subprocess.run(nightly, check=True, cwd=str(kdir), env=env)
             cand = kdir / "target" / "i686-unknown-none" / profile / "kernel"
             if cand.exists():
                 artifact = cand
@@ -150,9 +154,9 @@ def build_kernel_rust(release=True):
         except: pass
         alt = [CARGO, "build", "--manifest-path", str(kdir / "Cargo.toml"), "--target", "i686-pc-windows-gnu"]
         if release: alt.append("--release")
-        print(f"[+] {' '.join(alt)}")
+        print(f"[+] {' '.join(alt)}  BUILD_DATE={env.get('BUILD_DATE','')}")
         try:
-            subprocess.run(alt, check=True)
+            subprocess.run(alt, check=True, env=env)
             candidates = [
                 kdir / "target" / "i686-pc-windows-gnu" / profile / "kernel",
                 kdir / "target" / "i686-pc-windows-gnu" / profile / "kernel.exe",

@@ -127,10 +127,23 @@ pub fn print_hex_byte(b: u8) {
 }
 pub fn print_hex_u8(b: u8) { print_hex_byte(b); }
 pub fn print_hex_u16(w: u16) { print_hex_byte((w>>8) as u8); print_hex_byte(w as u8); }
+pub fn print_hex_u32(v: u32) {
+    print_hex_byte((v>>24) as u8);
+    print_hex_byte((v>>16) as u8);
+    print_hex_byte((v>>8) as u8);
+    print_hex_byte(v as u8);
+}
 
 pub fn print_dec(mut n: u16) {
     if n == 0 { put_char(b'0'); return; }
     let mut buf = [0u8; 5];
+    let mut i = 0;
+    while n > 0 { buf[i] = b'0' + (n % 10) as u8; n /= 10; i += 1; }
+    while i > 0 { i -= 1; put_char(buf[i]); }
+}
+pub fn print_dec_u32(mut n: u32) {
+    if n == 0 { put_char(b'0'); return; }
+    let mut buf = [0u8; 10];
     let mut i = 0;
     while n > 0 { buf[i] = b'0' + (n % 10) as u8; n /= 10; i += 1; }
     while i > 0 { i -= 1; put_char(buf[i]); }
