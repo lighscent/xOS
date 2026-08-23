@@ -45,3 +45,22 @@ dd if=build\xos-usb.img of=/dev/sdX bs=4M   # or use Rufus
 # Linux
 sudo dd if=build/xos-usb.img of=/dev/sdX bs=4M status=progress; sync
 ```
+
+## todo
+
+- [x] bootloader (512b)
+- [x] build floppy + iso
+- [x] azerty and qwerty layout
+- [x] added SIGINT
+- [x] simple MBR partition
+- [x] fat12 filesystem (FAT32 sur HDD)
+- [x] install bootloader to MBR
+- [x] make xOS USB live
+- [ ] text editor
+- [ ] colors
+- [ ] cmd ls, rm, touch
+- [ ] sudo
+- [ ] user accounts
+- [ ] detect hard disks
+- [ ] copy system files to disk
+- [ ] command `install`
