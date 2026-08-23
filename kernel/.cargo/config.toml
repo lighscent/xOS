@@ -1,0 +1,9 @@
+[build]
+rustflags = ["-C", "link-arg=-Tlinker.ld"]
+
+[target.i686-unknown-none]
+rustflags = ["-C", "link-arg=-Tlinker.ld"]
+
+[target.i686-pc-windows-gnu]
+rustflags = ["-C", "link-arg=-Tlinker.ld"]
+linker = "C:\\Users\\x\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\lib\\rustlib\\x86_64-pc-windows-msvc\\bin\\rust-lld.exe"
