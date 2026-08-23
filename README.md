@@ -21,8 +21,17 @@ simple 16-bit os with asm
 - [x] build floppy + iso
 - [x] azerty and qwerty layout
 - [x] added SIGINT
-- [ ] protected mode 32bit
-- [ ] fat12 filesystem
 - [ ] text editor
 - [ ] colors
 - [ ] cmd ls, rm, touch
+- [ ] command history
+- [ ] process viewer
+- [ ] sudo
+- [ ] user accounts
+- [ ] detect hard disks
+- [ ] simple MBR partition
+- [ ] fat12 filesystem
+- [ ] copy system files to disk
+- [ ] install bootloader to MBR
+- [ ] command `install`
+- [ ] make OS installable
