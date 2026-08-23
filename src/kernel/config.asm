@@ -1,8 +1,5 @@
-; config.asm - persist settings (layout) to floppy sector 18
-
 CFG_SECTOR equ 18
 
-; read config sector, apply layout if magic ok
 load_config:
     mov ah, 0x02
     mov al, 1
@@ -17,7 +14,6 @@ load_config:
 .fail:
     ret
 
-; write current layout to config sector
 save_config:
     mov word [cfg_sector], 'xO'
     mov word [cfg_sector+2], 'SC'
@@ -28,7 +24,6 @@ save_config:
     call cfg_rw
     ret
 
-; AH=02 read / AH=03 write, AL=1 sector -> cfg_sector (ES=0)
 cfg_rw:
     push es
     push bx

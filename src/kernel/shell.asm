@@ -1,5 +1,3 @@
-; shell.asm - command dispatch
-
 handle_command:
     call is_empty
     jc .ret
@@ -97,7 +95,7 @@ do_halt:
 do_shutdown:
     mov si, msg_shutdown
     call print
-    ; APM shutdown (works in VirtualBox)
+    ; APM shutdown
     mov ax, 0x5300
     xor bx, bx
     int 0x15

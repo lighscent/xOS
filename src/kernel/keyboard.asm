@@ -1,6 +1,3 @@
-; keyboard.asm - input + azerty/qwerty layout
-
-; translate AL if layout=azerty (swap a<->q, z<->w, etc)
 translate_key:
     cmp byte [layout], 0
     je .ret
@@ -68,7 +65,6 @@ translate_key:
 .ret:
     ret
 
-; read line into buffer via int 16h, echo, handle backspace/enter
 read_line:
     xor di, di
     mov cx, 0
@@ -77,9 +73,9 @@ read_line:
     int 0x16
     call translate_key
 
-    cmp al, 13          ; enter
+    cmp al, 13
     je .done
-    cmp al, 8           ; backspace
+    cmp al, 8
     je .backspace
     cmp al, 0x7F
     je .backspace

@@ -1,5 +1,3 @@
-; console.asm - screen handling (BIOS int 10h)
-
 clear_screen:
     mov ah, 0x00
     mov al, 0x03

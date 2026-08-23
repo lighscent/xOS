@@ -1,6 +1,3 @@
-; boot.asm - Stage 1 bootloader (512 bytes)
-; Loads kernel from disk sectors 2+ to 0x7E00 and jumps to it
-
 bits 16
 org 0x7C00
 
@@ -43,15 +40,14 @@ start:
     mov si, msg_loading
     call print
 
-    ; load kernel: 16 sectors (8KB) from LBA 1 to 0x7E00
-    mov ax, 0x07E0       ; es = 0x07E0 -> 0x7E00 linear
+    mov ax, 0x07E0
     mov es, ax
-    xor bx, bx           ; es:bx = 0x07E0:0x0000 = 0x7E00
+    xor bx, bx
 
-    mov al, 16           ; sectors to read
-    mov ch, 0            ; cylinder 0
-    mov cl, 2            ; sector 2 (1-based)
-    mov dh, 0            ; head 0
+    mov al, 16
+    mov ch, 0
+    mov cl, 2
+    mov dh, 0
     mov dl, [drive]
 
     mov ah, 0x02
@@ -66,12 +62,10 @@ start:
 disk_error:
     mov si, msg_disk_err
     call print
-    ; print error code in AH
     mov al, ah
     call print_hex
     jmp halt
 
-; print null-terminated string at DS:SI
 print:
     lodsb
     or al, al

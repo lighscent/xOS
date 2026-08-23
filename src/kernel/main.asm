@@ -1,4 +1,3 @@
-; main.asm - xOS kernel entry (16-bit, org 0x7E00)
 bits 16
 org 0x7E00
 

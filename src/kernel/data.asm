@@ -1,5 +1,3 @@
-; data.asm - all strings and buffers
-
 banner:     db 13,10,"==============================",13,10
             db "  xOS v0.1 - by xl1te",13,10
             db "  (c) 2026 - 16-bit real mode",13,10

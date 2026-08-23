@@ -1,6 +1,3 @@
-; string.asm - helpers
-
-; SI=cmd, DI=buffer -> CF=1 if equal
 streq:
     push si
     push di
@@ -24,7 +21,6 @@ streq:
     clc
     ret
 
-; SI=prefix, DI=buffer -> CF=1 if buffer starts with prefix
 starts_with:
     push si
     push di
