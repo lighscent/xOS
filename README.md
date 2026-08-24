@@ -2,6 +2,8 @@
 
 Simple 32-bit os built in asm and rust with 512b MBR boot stub
 
+**Check the wiki [here](https://github.com/lighscent/xOS/wiki)**
+
 ## commands
 
 `help` `clear` `info` `echo <text>` `layout [azerty|qwerty]` `reboot` `halt` `shutdown`
