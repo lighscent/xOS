@@ -30,6 +30,7 @@ pub extern "C" fn _start() -> ! {
     let boot_drive: u8;
     unsafe { core::arch::asm!("mov {0}, dl", out(reg_byte) boot_drive); }
 
+    vga::set_attr(0x07);
     vga::clear_screen();
     unsafe { crate::bios::init(); }
     keyboard::init();

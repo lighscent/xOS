@@ -56,8 +56,8 @@ sudo dd if=build/xos-usb.img of=/dev/sdX bs=4M status=progress; sync
 - [x] fat12 filesystem (FAT32 sur HDD)
 - [x] install bootloader to MBR
 - [x] make xOS USB live
+- [x] colors
 - [ ] text editor
-- [ ] colors
 - [ ] cmd ls, rm, touch
 - [ ] sudo
 - [ ] user accounts

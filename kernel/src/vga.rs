@@ -115,9 +115,38 @@ pub fn vga() -> &'static mut Vga { unsafe { &mut *&raw mut VGA } }
 
 pub fn clear_screen() { vga().clear(); }
 pub fn set_color(fg: Color, bg: Color) { vga().set_color(fg, bg); }
+pub fn set_attr(attr: u8) { vga().color = attr; }
+pub fn get_attr() -> u8 { vga().color }
 pub fn print(s: &str) { vga().write_str(s); }
 pub fn print_bytes(s: &[u8]) { vga().write(s); }
 pub fn put_char(c: u8) { vga().put_char(c); }
+
+// \xBG syntax: B=bg (0-F) G=fg (0-F) -> attr = (bg<<4)|fg
+fn hex_val(c: u8) -> Option<u8> {
+    match c {
+        b'0'..=b'9' => Some(c - b'0'),
+        b'a'..=b'f' => Some(c - b'a' + 10),
+        b'A'..=b'F' => Some(c - b'A' + 10),
+        _ => None,
+    }
+}
+
+pub fn print_colored(s: &str) { print_colored_bytes(s.as_bytes()); }
+pub fn print_colored_bytes(s: &[u8]) {
+    let mut i = 0;
+    while i < s.len() {
+        if s[i] == b'\\' && i + 3 < s.len() && (s[i+1] == b'x' || s[i+1] == b'X') {
+            if let (Some(bg), Some(fg)) = (hex_val(s[i+2]), hex_val(s[i+3])) {
+                let attr = (bg << 4) | fg;
+                vga().color = attr;
+                i += 4;
+                continue;
+            }
+        }
+        vga().put_char(s[i]);
+        i += 1;
+    }
+}
 
 #[allow(unused)]
 pub fn print_hex_byte(b: u8) {

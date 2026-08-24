@@ -24,7 +24,7 @@ fn trim_after(buf: &[u8], n: usize) -> &[u8] {
 }
 
 fn do_help() {
-    vga::print("Commands:\n  help   - show this help\n  clear  - clear screen\n  info   - system info\n  memdebug - dump SMBIOS RAM raw\n  echo <text> - print text\n  layout [azerty|qwerty] - show/set layout\n  kbddebug - toggle scancode debug [XX S]\n  reboot - reboot machine\n  halt   - halt CPU\n  shutdown - power off\n\n");
+    vga::print("Commands:\n  help     - show this help\n  clear    - clear screen\n  info     - system info\n  memdebug - dump SMBIOS RAM raw\n  echo     - print text\n  layout   - show/set layout [azerty|qwerty]\n  kbddebug - toggle scancode debug\n  reboot   - reboot machine\n  halt     - halt CPU\n  shutdown - power off\n");
 }
 fn do_clear() { vga::clear_screen(); }
 fn do_reboot() {
@@ -139,8 +139,9 @@ fn do_layout_set(arg: &[u8]) {
     else { vga::print("Usage: layout [azerty|qwerty]\n"); }
 }
 fn do_echo(rest: &[u8]) {
-    if rest.is_empty() { return; }
-    vga::print_bytes(rest);
+    if rest.is_empty() { vga::print("\n"); return; }
+    vga::print_colored_bytes(rest);
+    vga::set_attr(0x07);
     vga::print("\n");
 }
 fn do_halt() {
