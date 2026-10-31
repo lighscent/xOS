@@ -1,12 +1,12 @@
 # xOS
 
-Simple 32-bit os built in asm and rust with 512b MBR boot stub
+Simple 32-bit OS: 512 B NASM MBR boot stub + pure-Rust `no_std` kernel (16 KB)
 
 **Check the wiki [here](https://github.com/lighscent/xOS/wiki)**
 
 ## commands
 
-`help` `clear` `info` `echo <text>` `layout [azerty|qwerty]` `reboot` `halt` `shutdown`
+`help` `clear` `info` `memdebug` `kbddebug` `echo <text>` `layout [azerty|qwerty]` `reboot` `halt` `shutdown`
 
 ## build
 
@@ -17,33 +17,33 @@ winget install Rustlang.Rustup
 rustup toolchain install nightly
 rustup component add llvm-tools-preview rust-src --toolchain nightly
 
-python scripts/build.py              # release
+python scripts/build.py              # release (fails if kernel > 16384)
 python scripts/build.py --debug      # debug
 python scripts/build.py --no-vdi     # skip VDI/VMDK
 python scripts/build.py --usb-size 32 --vm-size 32
 
-python build.py                       # shim -> scripts/build.py
-python scripts/test.py                # verify boot 512 55AA + kernel 8192
+python scripts/test.py                # verify boot 512 55AA + kernel 16384 + images
 ```
 
 ## run (VM)
 
 ```powershell
 .\setup_vbox.ps1                   # auto picks xos-vm.vdi > vm.img > usb.img
-.\setup_vbox.ps1 -Mode vm          # VM HDD (SATA)
-.\setup_vbox.ps1 -Mode usb         # test USB image as SATA
-.\setup_vbox.ps1 -Mode floppy
-.\setup_vbox.ps1 -Mode iso
+.\setup_vbox.ps1 -Mode vm          # VM HDD (SATA) - works
+.\setup_vbox.ps1 -Mode floppy      # works
 
-python scripts/debug.py --headless  # build + VBox headless + tail serial.log
+python scripts/debug.py --headless  # build + VBox headless (serial.log stays empty: no UART driver yet)
 python scripts/debug.py --qemu      # qemu-system-i386 -drive file=build/xos-vm.img
 ```
 
+`-Mode usb` and `-Mode iso` are broken on VirtualBox 7.2 (raw `.img` rejected as HDD, ISOs don't boot as CD). Use the `.vdi` or the floppy image.
+
 ## USB live
 
+Legacy/CSM BIOS only, no UEFI.
+
 ```powershell
-# Windows (PowerShell Admin) - DD mode
-dd if=build\xos-usb.img of=/dev/sdX bs=4M   # or use Rufus
+# Windows: flash build\xos-usb.img with Rufus (DD mode)
 # Linux
 sudo dd if=build/xos-usb.img of=/dev/sdX bs=4M status=progress; sync
 ```
