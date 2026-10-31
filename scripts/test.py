@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""quick checks: boot 512 AA55, kernel 8192, strings, image sizes"""
+"""checks: boot 512 55AA, kernel 16384, required strings, image sizes + MBR sig"""
 import pathlib, struct
 ROOT = pathlib.Path(__file__).parent.parent
 BUILD = ROOT / "build"
@@ -13,6 +13,8 @@ def check():
     else: print(f"[OK] boot.bin 512")
     if d[510]!=0x55 or d[511]!=0xAA: print(f"[FAIL] boot sig {d[510]:02X}{d[511]:02X}"); ok=False
     else: print(f"[OK] boot sig 55AA")
+    if d[450]!=0x0C: print(f"[FAIL] boot part type {d[450]:02X} != 0C"); ok=False
+    else: print("[OK] boot part type 0C")
     if b"Booting xOS" not in d: print("[WARN] boot missing string Booting xOS")
     else: print("[OK] boot string")
     kern=BUILD/"kernel.bin"
@@ -22,8 +24,8 @@ def check():
         if len(kd)!=16384: print(f"[FAIL] kernel {len(kd)} !=16384"); ok=False
         else: print(f"[OK] kernel 16384")
         for s in [b"xOS",b"help",b"panic"]:
-            if s.lower() in kd.lower(): print(f"[OK] kernel contains {s.decode()}"); break
-        else: print("[WARN] kernel missing expected strings (help/panic) - ok for rust flat bin")
+            if s.lower() in kd.lower(): print(f"[OK] kernel contains {s.decode()}")
+            else: print(f"[FAIL] kernel missing string {s.decode()}"); ok=False
     for name,exp in [("xos-floppy.img",1474560),("xos-usb.img",33554432),("xos-vm.img",33554432)]:
         p=BUILD/name
         if p.exists():

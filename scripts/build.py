@@ -32,7 +32,7 @@ def make_img(boot_bin, kernel_bin, out_img):
     boot[510]=0x55; boot[511]=0xAA
     kernel = kernel_bin.read_bytes() if kernel_bin and kernel_bin.exists() else b""
     if len(kernel)>32*512:
-        print(f"[!] kernel {len(kernel)} trunc to 16384"); kernel=kernel[:32*512]
+        print(f"[FAIL] kernel {len(kernel)} > 16384, boot loads only 32 sectors - shrink kernel", file=sys.stderr); sys.exit(1)
     img = bytes(boot)+kernel
     if len(img)%512!=0: img+=b"\x00"*(512-len(img)%512)
     FLOPPY=1474560
@@ -42,7 +42,8 @@ def make_img(boot_bin, kernel_bin, out_img):
 def make_hdd_image(boot_bin, kernel_bin, out_img, size_mb=32):
     boot=bytearray(boot_bin.read_bytes()); assert len(boot)==512
     kernel=kernel_bin.read_bytes() if kernel_bin and kernel_bin.exists() else b""
-    if len(kernel)>32*512: kernel=kernel[:32*512]
+    if len(kernel)>32*512:
+        print(f"[FAIL] kernel {len(kernel)} > 16384, boot loads only 32 sectors - shrink kernel", file=sys.stderr); sys.exit(1)
     if len(kernel)<32*512: kernel=kernel+b"\x00"*(32*512-len(kernel))
     total=size_mb*1024*1024//512; hidden=2048; rsvd=32; num_fats=2; spc=8
     part=total-hidden; fat_sz=calc_fat_sz(part,rsvd,num_fats,spc)
@@ -190,7 +191,7 @@ def build_kernel_rust(release=True):
     # ensure 16384 padded/truncated (32 sectors)
     data = out.read_bytes()
     if len(data) > 16384:
-        print(f"[!] kernel {len(data)} > 16384 trunc"); data=data[:16384]; out.write_bytes(data)
+        print(f"[FAIL] kernel {len(data)} > 16384, boot loads only 32 sectors - shrink kernel", file=sys.stderr); sys.exit(1)
     elif len(data) < 16384:
         data += b"\x00"*(16384-len(data)); out.write_bytes(data)
     print(f"[+] kernel.bin {out.stat().st_size} bytes from {artifact.name}")
