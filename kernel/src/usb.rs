@@ -68,17 +68,42 @@ fn check() {
     }
 }
 
+// Runs from 0x500, below the wiped range, so it survives while zeroing the
+// kernel, its stack and the rest of low RAM.
+core::arch::global_asm!(
+    r#"
+    .section .text.wipe, "ax"
+    .code32
+    .global wipe_stub_start
+wipe_stub_start:
+    cli
+    cld
+    xor eax, eax
+    mov edi, 0x600
+    mov ecx, 0x9EA00
+    rep stosb
+wipe_stub_hlt:
+    hlt
+    jmp wipe_stub_hlt
+    .global wipe_stub_end
+wipe_stub_end:
+    "#
+);
+
+extern "C" {
+    static wipe_stub_start: u8;
+    static wipe_stub_end: u8;
+}
+
 fn panic_wipe() -> ! {
     vga::clear_screen();
     vga::print("\n[!] USB removed! Wiping memory...\nShutting down NOW.\n");
     unsafe {
-        core::arch::asm!(
-            "mov ax, 0xB800; mov es, ax; xor di, di; mov cx, 80*25; mov ax, 0x0720; rep stosw",
-            out("ax") _, out("di") _, out("cx") _
-        );
-        let start = 0x600 as *mut u8;
-        let len = 0x9F000 - 0x600;
-        core::ptr::write_bytes(start, 0, len);
-        loop { core::arch::asm!("cli; hlt"); }
+        // ES must be flat before the stub overwrites the GDT at 0x500.
+        core::arch::asm!("mov ax, 0x10", "mov es, ax", out("ax") _);
+        let src = core::ptr::addr_of!(wipe_stub_start);
+        let len = core::ptr::addr_of!(wipe_stub_end) as usize - src as usize;
+        core::ptr::copy_nonoverlapping(src, 0x500 as *mut u8, len);
+        core::arch::asm!("jmp eax", in("eax") 0x500u32, options(noreturn));
     }
 }
