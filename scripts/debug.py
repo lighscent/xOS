@@ -44,7 +44,7 @@ def vbox_debug(vm="xOS", mode="vm", headless=False, serial_log=None):
     if serial_log:
         serial_log.parent.mkdir(parents=True, exist_ok=True)
         # VBox serial: file
-        subprocess.run([vbox,"modifyvm",vm,"--uart1","0x3F8","4","--uartmode1","file",str(serial_log)], capture_output=True)
+        subprocess.run([vbox,"modifyvm",vm,"--uart1","0x3F8","4","--uartmode1","file",str(serial_log.resolve())], capture_output=True)
         print(f"[+] serial log {serial_log}")
     else:
         subprocess.run([vbox,"modifyvm",vm,"--uart1","off"], capture_output=True)
